@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="auth-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-4 col-md-6">
+
+        <div class="text-center mb-4">
+          <div class="auth-icon green"><i class="bi bi-building-fill"></i></div>
+          <h2 class="auth-title">Finance Head Login</h2>
+          <p class="auth-subtitle">Access your company finance dashboard</p>
+        </div>
+
+        <div class="auth-card">
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="auth-label">Company Email</label>
+              <div class="input-group">
+                <span class="input-group-text auth-input-icon"><i class="bi bi-envelope"></i></span>
+                <input type="email" name="email" class="form-control" placeholder="finance@company.com" required>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="auth-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text auth-input-icon"><i class="bi bi-lock"></i></span>
+                <input type="password" name="password" id="pass" class="form-control" placeholder="Your password" required>
+                <button class="btn pass-toggle" type="button" onclick="togglePass('pass','eye')">
+                  <i class="bi bi-eye" id="eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="auth-btn auth-btn-green">
+              <i class="bi bi-box-arrow-in-right"></i> Login as Finance Head
+            </button>
+          </form>
+
+          <p class="auth-bottom-link">
+            No company account?
+            <a href="{% url 'accounts:company_register' %}" class="green">Register here</a>
+          </p>
+        </div>
+
+        <div class="auth-other-links">
+          Other logins:
+          <a href="{% url 'accounts:individual_login' %}">Individual</a> |
+          <a href="{% url 'accounts:dept_rep_login' %}">Dept Rep</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script>
+function togglePass(i,e){const a=document.getElementById(i),b=document.getElementById(e);if(a.type==='password'){a.type='text';b.classList.replace('bi-eye','bi-eye-slash');}else{a.type='password';b.classList.replace('bi-eye-slash','bi-eye');}}
+</script>
+{% endblock %}
