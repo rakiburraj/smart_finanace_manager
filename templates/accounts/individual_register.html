@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+
 <section class="auth-section">
   <div class="container">
     <div class="row justify-content-center">
@@ -9,9 +10,11 @@
 
         
         <div class="text-center mb-4">
-          <div class="auth-icon green"><i class="bi bi-building-fill"></i></div>
-          <h2 class="auth-title">Register Your Company</h2>
-          <p class="auth-subtitle">Set up your company finance management system</p>
+          <div class="auth-icon blue">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <h2 class="auth-title">Create Individual Account</h2>
+          <p class="auth-subtitle">Track your personal finances with ease</p>
         </div>
 
         
@@ -19,135 +22,155 @@
           <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
-           
-            <div class="mb-3">
-              <label class="auth-label">Company Name</label>
-              <div class="input-group">
-                <span class="input-group-text auth-input-icon"><i class="bi bi-building"></i></span>
-                <input type="text" name="company_name" class="form-control" placeholder="e.g. Acme Corporation" required>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="auth-label">First Name</label>
+                <div class="input-group">
+                  <span class="input-group-text auth-input-icon">
+                    <i class="bi bi-person"></i>
+                  </span>
+                  <input type="text" name="first_name" class="form-control" placeholder="John" required>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="auth-label">Last Name</label>
+                <div class="input-group">
+                  <span class="input-group-text auth-input-icon">
+                    <i class="bi bi-person-badge"></i>
+                  </span>
+                  <input type="text" name="last_name" class="form-control" placeholder="Doe" required>
+                </div>
               </div>
             </div>
 
             
             <div class="mb-3">
-              <label class="auth-label">Company Address</label>
+              <label class="auth-label">Email</label>
               <div class="input-group">
-                <span class="input-group-text auth-input-icon"><i class="bi bi-geo-alt"></i></span>
-                <textarea name="company_address" class="form-control" rows="2" placeholder="Full company address" required></textarea>
+                <span class="input-group-text auth-input-icon">
+                  <i class="bi bi-envelope"></i>
+                </span>
+                <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
               </div>
             </div>
 
             
             <div class="mb-3">
-              <label class="auth-label">About the Company</label>
-              <textarea name="company_description" class="form-control" rows="3" placeholder="Briefly describe your company and what it does..." required></textarea>
+              <label class="auth-label">Profession</label>
+              <div class="input-group">
+                <span class="input-group-text auth-input-icon">
+                  <i class="bi bi-briefcase"></i>
+                </span>
+                <input type="text" name="profession" class="form-control" placeholder="Software Engineer">
+              </div>
+            </div>
+
+            
+            <div class="mb-3">
+              <label class="auth-label">Income Source</label>
+              <div class="input-group">
+                <span class="input-group-text auth-input-icon">
+                  <i class="bi bi-cash-stack"></i>
+                </span>
+                <input type="text" name="income_source" class="form-control" placeholder="Salary / Freelance">
+              </div>
             </div>
 
             
             <div class="row g-3 mb-3">
               <div class="col-md-6">
-                <label class="auth-label">Monthly Income (BDT)</label>
+                <label class="auth-label">Monthly Income</label>
                 <div class="input-group">
-                  <span class="input-group-text" style="background:#f0fdf4;border-color:#e2e8f0;color:#16a34a;"><i class="bi bi-arrow-up-circle"></i></span>
-                  <input type="number" name="monthly_income" class="form-control" placeholder="500000" step="0.01" required>
+                  <span class="input-group-text" style="background:#f0fdf4;color:#16a34a;">
+                    <i class="bi bi-arrow-up-circle"></i>
+                  </span>
+                  <input type="number" name="monthly_income" class="form-control" placeholder="50000">
                 </div>
               </div>
+
               <div class="col-md-6">
-                <label class="auth-label">Monthly Expense (BDT)</label>
+                <label class="auth-label">Monthly Expense</label>
                 <div class="input-group">
-                  <span class="input-group-text" style="background:#fef2f2;border-color:#e2e8f0;color:#dc2626;"><i class="bi bi-arrow-down-circle"></i></span>
-                  <input type="number" name="monthly_expense" class="form-control" placeholder="300000" step="0.01" required>
+                  <span class="input-group-text" style="background:#fef2f2;color:#dc2626;">
+                    <i class="bi bi-arrow-down-circle"></i>
+                  </span>
+                  <input type="number" name="monthly_expense" class="form-control" placeholder="30000">
                 </div>
               </div>
             </div>
 
             
-            <div class="auth-divider"><span>Finance Head Details</span></div>
-
-            
             <div class="mb-3">
-              <label class="auth-label">Finance Head Name</label>
+              <label class="auth-label">Profile Picture</label>
               <div class="input-group">
-                <span class="input-group-text auth-input-icon"><i class="bi bi-person-badge"></i></span>
-                <input type="text" name="first_name" class="form-control" placeholder="Full name of the finance head" required>
+                <span class="input-group-text auth-input-icon">
+                  <i class="bi bi-image"></i>
+                </span>
+                <input type="file" name="profile_pic" class="form-control" onchange="previewPic(this)">
               </div>
+
+              <img id="preview" class="mt-2" style="width:70px;height:70px;border-radius:50%;object-fit:cover;display:none;border:2px solid #e2e8f0;">
             </div>
 
             
-            <div class="mb-3">
-              <label class="auth-label">Company Email</label>
-              <div class="input-group">
-                <span class="input-group-text auth-input-icon"><i class="bi bi-envelope"></i></span>
-                <input type="email" name="company_email" class="form-control" placeholder="finance@company.com" required>
-              </div>
-            </div>
-
-            
-            <div class="auth-divider"><span>Security</span></div>
-
             <div class="row g-3 mb-4">
               <div class="col-md-6">
                 <label class="auth-label">Password</label>
                 <div class="input-group">
-                  <span class="input-group-text auth-input-icon"><i class="bi bi-lock"></i></span>
-                  <input type="password" name="password1" id="pass1" class="form-control" placeholder="Min 8 characters" required>
-                  <button class="btn pass-toggle" type="button" onclick="togglePass('pass1','eye1')">
-                    <i class="bi bi-eye" id="eye1"></i>
-                  </button>
+                  <span class="input-group-text auth-input-icon">
+                    <i class="bi bi-lock"></i>
+                  </span>
+                  <input type="password" name="password1" id="pass1" class="form-control" required>
                 </div>
               </div>
+
               <div class="col-md-6">
                 <label class="auth-label">Confirm Password</label>
                 <div class="input-group">
-                  <span class="input-group-text auth-input-icon"><i class="bi bi-lock-fill"></i></span>
-                  <input type="password" name="password2" id="pass2" class="form-control" placeholder="Repeat password" required>
-                  <button class="btn pass-toggle" type="button" onclick="togglePass('pass2','eye2')">
-                    <i class="bi bi-eye" id="eye2"></i>
-                  </button>
+                  <span class="input-group-text auth-input-icon">
+                    <i class="bi bi-lock-fill"></i>
+                  </span>
+                  <input type="password" name="password2" id="pass2" class="form-control" required>
                 </div>
               </div>
             </div>
 
             
             {% if form.errors %}
-            <div class="alert alert-danger mb-3">
-              {% for field in form %}{% for error in field.errors %}<div>{{ error }}</div>{% endfor %}{% endfor %}
-              {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+            <div class="alert alert-danger">
+              {{ form.errors }}
             </div>
             {% endif %}
 
             
-            <button type="submit" class="auth-btn auth-btn-green">
-              <i class="bi bi-building-check"></i> Register Company
+            <button type="submit" class="auth-btn auth-btn-blue">
+              <i class="bi bi-person-check"></i> Create Account
             </button>
+
           </form>
 
           <p class="auth-bottom-link">
-            Already registered?
-            <a href="{% url 'accounts:finance_head_login' %}" class="green">Login as Finance Head</a>
+            Already have an account?
+            <a href="{% url 'accounts:individual_login' %}" class="blue">Login</a>
           </p>
         </div>
 
-        <p class="text-center mt-3" style="font-size:0.85rem;">
-          <a href="/" style="color:#94a3b8;text-decoration:none;"><i class="bi bi-arrow-left me-1"></i>Back to home</a>
-        </p>
       </div>
     </div>
   </div>
 </section>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function togglePass(inputId, iconId) {
-  const input = document.getElementById(inputId);
-  const icon  = document.getElementById(iconId);
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.classList.replace('bi-eye', 'bi-eye-slash');
-  } else {
-    input.type = 'password';
-    icon.classList.replace('bi-eye-slash', 'bi-eye');
+function previewPic(input){
+  const img = document.getElementById('preview');
+  if(input.files && input.files[0]){
+    img.src = URL.createObjectURL(input.files[0]);
+    img.style.display = 'block';
   }
 }
 </script>
