@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<section style="background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white; padding: 100px 0; text-align: center;">
+  <div class="container">
+    <h1 style="font-size: 2.8rem; font-weight: 700; margin-bottom: 16px;">Smart Finance Manager</h1>
+    <p style="font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto 32px;">
+      Take control of your finances with intelligent insights, real-time tracking,
+      and powerful analytics for individuals and businesses.
+    </p>
+   <a href="#solutions" class="btn btn-light btn-lg me-3" style="font-weight: 600; border-radius: 10px;">
+  Get Started
+</a>
+    <a href="#features" class="btn btn-outline-light btn-lg" style="border-radius: 10px;">Learn More</a>
+  </div>
+</section>
+
+
+<section id="features" style="padding: 80px 0; background: #f8fafc;">
+  <div class="container">
+    <h2 style="text-align: center; font-weight: 700; margin-bottom: 12px;">Why Choose Smart Finance Manager?</h2>
+    <p style="text-align: center; color: #64748b; margin-bottom: 48px;">Everything you need to manage money smartly</p>
+
+    <div class="row g-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="sfm-card text-center h-100">
+          <i class="bi bi-graph-up-arrow" style="font-size: 2rem; color: #2563eb; margin-bottom: 16px; display: block;"></i>
+          <h5 style="font-weight: 600;">Real-time Tracking</h5>
+          <p style="color: #64748b; font-size: 0.9rem;">Monitor your finances in real-time with live updates and instant notifications.</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="sfm-card text-center h-100">
+          <i class="bi bi-shield-check" style="font-size: 2rem; color: #2563eb; margin-bottom: 16px; display: block;"></i>
+          <h5 style="font-weight: 600;">Secure & Private</h5>
+          <p style="color: #64748b; font-size: 0.9rem;">Bank-level security ensures your financial data is always protected.</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="sfm-card text-center h-100">
+          <i class="bi bi-pie-chart" style="font-size: 2rem; color: #2563eb; margin-bottom: 16px; display: block;"></i>
+          <h5 style="font-weight: 600;">Smart Analytics</h5>
+          <p style="color: #64748b; font-size: 0.9rem;">Get intelligent insights and forecasts to make better financial decisions.</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="sfm-card text-center h-100">
+          <i class="bi bi-people" style="font-size: 2rem; color: #2563eb; margin-bottom: 16px; display: block;"></i>
+          <h5 style="font-weight: 600;">Team Collaboration</h5>
+          <p style="color: #64748b; font-size: 0.9rem;">Perfect for companies with multiple departments and finance teams.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="solutions" style="padding: 80px 0; background: white;">
+  <div class="container">
+    <h2 style="text-align: center; font-weight: 700; margin-bottom: 48px;">Solutions for Everyone</h2>
+    <div class="row g-4">
+
+      <div class="col-md-6">
+        <div class="sfm-card h-100" style="border-left: 4px solid #2563eb;">
+          <h4 style="font-weight: 700; color: #2563eb;"><i class="bi bi-person me-2"></i>Individual Mode</h4>
+          <p style="color: #64748b;">Track your personal income and expenses, set monthly budgets and stay on top of your finances.</p>
+          <ul style="color: #64748b; font-size: 0.9rem;">
+            <li>Add income & expenses</li>
+            <li>Set monthly budget</li>
+            <li>View transaction history</li>
+            <li>Financial reports</li>
+          </ul>
+          <a  href="{% url 'accounts:individual_register' %}" class="btn btn-dark mt-2" style="border-radius: 8px;">Get Started</a>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="sfm-card h-100" style="border-left: 4px solid #0f172a;">
+          <h4 style="font-weight: 700; color: #0f172a;"><i class="bi bi-building me-2"></i>Company Mode</h4>
+          <p style="color: #64748b;">Manage departments, assign representatives and control budgets across your entire organization.</p>
+          <ul style="color: #64748b; font-size: 0.9rem;">
+            <li>Create departments</li>
+            <li>Assign department reps</li>
+            <li>Budget request system</li>
+            <li>Upload evidence files</li>
+          </ul>
+          <a href="{% url 'accounts:company_register' %}" class="btn btn-dark mt-2" style="border-radius: 8px;">Get Started</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

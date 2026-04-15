@@ -1,5 +1,5 @@
 """
-URL configuration for smart_finance_manager project.
+URL configuration for smart_finance project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -15,8 +15,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.shortcuts import render
+
+def home(request):
+    return render(request, 'home.html')
 
 urlpatterns = [
+    path('', home, name='home'),          # ← this fixes the 404
     path('admin/', admin.site.urls),
-]
+    path('accounts/', include('accounts.urls')),
+    path('individuals/', include('individuals.urls')),
+    path('department/', include('department.urls')),
+    path('budget/', include('budget.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
