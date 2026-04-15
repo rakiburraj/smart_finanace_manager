@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="background:#f8fafc; min-height:100vh; padding:32px 0;">
+<div class="container">
+
+  
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h4 style="font-weight:700;color:#0f172a;margin:0;">Welcome back, {{ user.first_name|default:user.username }} 👋</h4>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+
+  
+  <img
+    src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}https://cdn-icons-png.flaticon.com/512/3135/3135715.png{% endif %}"
+    alt="Profile Picture"
+    style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.08);"
+>
+
+  <div>
+    <p style="margin:0;font-weight:600;color:#0f172a;">
+      {{ user.username }}
+    </p>
+    <p style="margin:0;font-size:0.8rem;color:#64748b;">
+      {{ user.role }}
+    </p>
+  </div>
+
+</div>
+      <p style="color:#64748b;font-size:0.88rem;margin:0;">{{ today|date:"l, F d Y" }}</p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'individuals:add_transaction' %}" style="background:#2563eb;color:white;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:0.9rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+        <i class="bi bi-plus-lg"></i> Add Transaction
+      </a>
+      <a href="{% url 'individuals:set_budget' %}" style="background:white;color:#374151;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:0.9rem;font-weight:600;border:1px solid #e2e8f0;display:flex;align-items:center;gap:6px;">
+        <i class="bi bi-wallet2"></i> Set Budget
+      </a>
+      <a href="{% url 'individuals:edit_profile' %}" style="background:white;color:#374151;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:0.9rem;font-weight:600;border:1px solid #e2e8f0;display:flex;align-items:center;gap:6px;">
+        <i class="bi bi-person-gear"></i> Edit Profile
+      </a>
+    </div>
+  </div>
+
+  
+  {% if alert %}
+  <div style="background:{% if alert.level == 'danger' %}#fef2f2{% elif alert.level == 'warning' %}#fefce8{% else %}#eff6ff{% endif %};border:1px solid {% if alert.level == 'danger' %}#fecaca{% elif alert.level == 'warning' %}#fde68a{% else %}#bfdbfe{% endif %};border-radius:14px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:14px;">
+    <div style="width:42px;height:42px;border-radius:10px;background:{% if alert.level == 'danger' %}#fee2e2{% elif alert.level == 'warning' %}#fef9c3{% else %}#dbeafe{% endif %};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <i class="bi bi-{% if alert.level == 'danger' %}exclamation-triangle-fill{% elif alert.level == 'warning' %}exclamation-circle-fill{% else %}info-circle-fill{% endif %}" style="font-size:1.2rem;color:{% if alert.level == 'danger' %}#dc2626{% elif alert.level == 'warning' %}#ca8a04{% else %}#2563eb{% endif %};"></i>
+    </div>
+    <div style="flex:1;">
+      <p style="margin:0;font-weight:600;font-size:0.92rem;color:{% if alert.level == 'danger' %}#991b1b{% elif alert.level == 'warning' %}#854d0e{% else %}#1e40af{% endif %};">{{ alert.msg }}</p>
+      <div style="margin-top:8px;background:{% if alert.level == 'danger' %}#fecaca{% elif alert.level == 'warning' %}#fde68a{% else %}#bfdbfe{% endif %};border-radius:99px;height:8px;overflow:hidden;">
+        <div style="width:{{ pct_used }}%;height:100%;background:{% if alert.level == 'danger' %}#dc2626{% elif alert.level == 'warning' %}#ca8a04{% else %}#2563eb{% endif %};border-radius:99px;transition:width 0.5s;"></div>
+      </div>
+      <p style="margin:4px 0 0;font-size:0.8rem;color:{% if alert.level == 'danger' %}#dc2626{% elif alert.level == 'warning' %}#ca8a04{% else %}#2563eb{% endif %};">{{ pct_used }}% of ৳{{ budget }} used</p>
+    </div>
+  </div>
+  {% endif %}
+
+  
+  <div class="row g-3 mb-4">
+
+    
+    <div class="col-lg-3 col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="bi bi-arrow-up-circle-fill" style="font-size:1.3rem;color:#16a34a;"></i>
+        </div>
+        <div>
+          <p style="font-size:0.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin:0;">Today's Income</p>
+          <p style="font-size:1.3rem;font-weight:700;color:#0f172a;margin:0;">৳{{ today_income }}</p>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="col-lg-3 col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:#fee2e2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="bi bi-arrow-down-circle-fill" style="font-size:1.3rem;color:#dc2626;"></i>
+        </div>
+        <div>
+          <p style="font-size:0.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin:0;">Today's Expense</p>
+          <p style="font-size:1.3rem;font-weight:700;color:#0f172a;margin:0;">৳{{ today_expense }}</p>
+        </div>
+      </div>
+    </div>
+
+   
+    <div class="col-lg-3 col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="bi bi-wallet2" style="font-size:1.3rem;color:#2563eb;"></i>
+        </div>
+        <div>
+          <p style="font-size:0.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin:0;">Month Balance</p>
+          <p style="font-size:1.3rem;font-weight:700;color:{% if balance >= 0 %}#16a34a{% else %}#dc2626{% endif %};margin:0;">৳{{ balance }}</p>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="col-lg-3 col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:#fef9c3;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="bi bi-piggy-bank" style="font-size:1.3rem;color:#ca8a04;"></i>
+        </div>
+        <div>
+          <p style="font-size:0.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin:0;">Budget Left</p>
+          <p style="font-size:1.3rem;font-weight:700;color:#0f172a;margin:0;">৳{% if budget > 0 %}{{ budget|floatformat:0|add:"-0" }}{% else %}Not set{% endif %}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  
+  <div class="row g-3 mb-4">
+
+    <div class="col-lg-4 col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:22px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h6 style="font-weight:700;color:#0f172a;margin:0;">This Month</h6>
+          <span style="background:#eff6ff;color:#2563eb;font-size:0.75rem;font-weight:600;padding:3px 10px;border-radius:99px;">{{ today|date:"F Y" }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <div>
+            <p style="font-size:0.78rem;color:#16a34a;font-weight:600;margin:0;">Income</p>
+            <p style="font-size:1.1rem;font-weight:700;color:#0f172a;margin:0;">৳{{ month_income }}</p>
+          </div>
+          <div style="text-align:right;">
+            <p style="font-size:0.78rem;color:#dc2626;font-weight:600;margin:0;">Expense</p>
+            <p style="font-size:1.1rem;font-weight:700;color:#0f172a;margin:0;">৳{{ month_expense }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:22px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h6 style="font-weight:700;color:#0f172a;margin:0;">This Year</h6>
+          <span style="background:#f0fdf4;color:#16a34a;font-size:0.75rem;font-weight:600;padding:3px 10px;border-radius:99px;">{{ today|date:"Y" }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <div>
+            <p style="font-size:0.78rem;color:#16a34a;font-weight:600;margin:0;">Income</p>
+            <p style="font-size:1.1rem;font-weight:700;color:#0f172a;margin:0;">৳{{ year_income }}</p>
+          </div>
+          <div style="text-align:right;">
+            <p style="font-size:0.78rem;color:#dc2626;font-weight:600;margin:0;">Expense</p>
+            <p style="font-size:1.1rem;font-weight:700;color:#0f172a;margin:0;">৳{{ year_expense }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-12">
+      <div style="background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:16px;padding:22px;color:white;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h6 style="font-weight:700;color:white;margin:0;">Monthly Budget</h6>
+          <a href="{% url 'individuals:set_budget' %}" style="color:rgba(255,255,255,0.7);font-size:0.78rem;text-decoration:none;">Edit</a>
+        </div>
+        {% if budget > 0 %}
+        <p style="font-size:1.3rem;font-weight:700;margin:0 0 10px;">৳{{ budget|floatformat:0 }}</p>
+        <div style="background:rgba(255,255,255,0.2);border-radius:99px;height:8px;overflow:hidden;">
+          <div style="width:{{ pct_used }}%;height:100%;background:{% if pct_used >= 90 %}#f87171{% elif pct_used >= 75 %}#fbbf24{% else %}#4ade80{% endif %};border-radius:99px;"></div>
+        </div>
+        <p style="font-size:0.8rem;opacity:0.8;margin:6px 0 0;">{{ pct_used }}% used &bull; ৳{{ month_expense }} spent</p>
+        {% else %}
+        <p style="opacity:0.8;font-size:0.9rem;margin:0;">No budget set yet.</p>
+        <a href="{% url 'individuals:set_budget' %}" style="color:white;font-size:0.88rem;font-weight:600;">Set budget now →</a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  
+  <div class="row g-3 mb-4">
+
+    
+    <div class="col-lg-7">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <h6 style="font-weight:700;color:#0f172a;margin:0;">Last 7 Days</h6>
+          <div style="display:flex;gap:12px;font-size:0.78rem;">
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#16a34a;display:inline-block;"></span>Income</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#dc2626;display:inline-block;"></span>Expense</span>
+          </div>
+        </div>
+        <canvas id="dailyChart" height="200"></canvas>
+      </div>
+    </div>
+
+    
+    <div class="col-lg-5">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:24px;">
+        <h6 style="font-weight:700;color:#0f172a;margin-bottom:20px;">Last 6 Months</h6>
+        <canvas id="monthlyChart" height="200"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
+    <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f1f5f9;">
+      <h6 style="font-weight:700;color:#0f172a;margin:0;">Recent Transactions</h6>
+      <a href="{% url 'individuals:transaction_list' %}" style="color:#2563eb;font-size:0.85rem;font-weight:600;text-decoration:none;">View All →</a>
+    </div>
+
+    {% if recent_txns %}
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#f8fafc;">
+            <th style="padding:12px 20px;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;text-align:left;">Date</th>
+            <th style="padding:12px 20px;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;text-align:left;">Description</th>
+            <th style="padding:12px 20px;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;text-align:left;">Category</th>
+            <th style="padding:12px 20px;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;text-align:left;">Type</th>
+            <th style="padding:12px 20px;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;text-align:right;">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for txn in recent_txns %}
+          <tr style="border-bottom:1px solid #f1f5f9;">
+            <td style="padding:14px 20px;font-size:0.88rem;color:#64748b;">{{ txn.date|date:"M d, Y" }}</td>
+            <td style="padding:14px 20px;font-size:0.88rem;color:#0f172a;max-width:200px;">{{ txn.description|truncatechars:40 }}</td>
+            <td style="padding:14px 20px;">
+              <span style="background:#f1f5f9;color:#374151;font-size:0.75rem;font-weight:500;padding:3px 10px;border-radius:99px;">{{ txn.category|capfirst }}</span>
+            </td>
+            <td style="padding:14px 20px;">
+              {% if txn.type == 'income' %}
+              <span style="background:#dcfce7;color:#16a34a;font-size:0.75rem;font-weight:600;padding:4px 10px;border-radius:99px;">Income</span>
+              {% else %}
+              <span style="background:#fee2e2;color:#dc2626;font-size:0.75rem;font-weight:600;padding:4px 10px;border-radius:99px;">Expense</span>
+              {% endif %}
+            </td>
+            <td style="padding:14px 20px;font-size:0.95rem;font-weight:700;text-align:right;color:{% if txn.type == 'income' %}#16a34a{% else %}#dc2626{% endif %};">
+              {% if txn.type == 'income' %}+{% else %}-{% endif %}৳{{ txn.amount }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div style="padding:48px;text-align:center;">
+      <i class="bi bi-receipt" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:12px;"></i>
+      <p style="color:#94a3b8;margin:0;">No transactions yet. <a href="{% url 'individuals:add_transaction' %}" style="color:#2563eb;font-weight:600;">Add one now</a></p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+new Chart(dailyCtx, {
+  type: 'bar',
+  data: {
+    labels: {{ labels|safe }},
+    datasets: [
+      { label: 'Income',  data: {{ income_data|safe }},  backgroundColor: 'rgba(22,163,74,0.15)',  borderColor: '#16a34a', borderWidth: 2, borderRadius: 6 },
+      { label: 'Expense', data: {{ expense_data|safe }}, backgroundColor: 'rgba(220,38,38,0.12)',  borderColor: '#dc2626', borderWidth: 2, borderRadius: 6 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+    }
+  }
+});
+
+const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+new Chart(monthlyCtx, {
+  type: 'line',
+  data: {
+    labels: {{ m_labels|safe }},
+    datasets: [
+      { label: 'Income',  data: {{ m_income|safe }},  borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,0.08)',  tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#16a34a' },
+      { label: 'Expense', data: {{ m_expense|safe }}, borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.06)', tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#dc2626' }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 10 } } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  }
+});
+</script>
+{% endblock %}
