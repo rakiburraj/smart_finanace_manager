@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import IndividualBudget,IndividualTransaction
 
-# Register your models here.
+admin.site.register(IndividualBudget)
+admin.site.register(IndividualTransaction)
