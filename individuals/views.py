@@ -29,32 +29,32 @@ def dashboard(request):
     user  = request.user
     today = date.today()
 
-    # All transactions
+    
     all_txns = IndividualTransaction.objects.filter(user=user)
 
-    # This month
+    
     month_txns   = all_txns.filter(date__year=today.year, date__month=today.month)
     month_income  = month_txns.filter(type='income').aggregate(Sum('amount'))['amount__sum']  or 0
     month_expense = month_txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
 
-    # Today
+    
     today_txns    = all_txns.filter(date=today)
     today_income  = today_txns.filter(type='income').aggregate(Sum('amount'))['amount__sum']  or 0
     today_expense = today_txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
 
-    # This year
+    
     year_txns    = all_txns.filter(date__year=today.year)
     year_income  = year_txns.filter(type='income').aggregate(Sum('amount'))['amount__sum']  or 0
     year_expense = year_txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
 
-    # Budget
+    
     budget_obj, _ = IndividualBudget.objects.get_or_create(user=user)
     budget        = float(budget_obj.monthly_budget)
     alert         = get_budget_alert(float(month_expense), budget)
     pct_used      = round((float(month_expense) / budget * 100)) if budget > 0 else 0
     pct_used      = min(pct_used, 100)
 
-    # Last 7 days chart data
+    
     labels, income_data, expense_data = [], [], []
     for i in range(6, -1, -1):
         d = today - timedelta(days=i)
@@ -62,7 +62,7 @@ def dashboard(request):
         income_data.append(float(all_txns.filter(date=d, type='income').aggregate(Sum('amount'))['amount__sum'] or 0))
         expense_data.append(float(all_txns.filter(date=d, type='expense').aggregate(Sum('amount'))['amount__sum'] or 0))
 
-    # Monthly chart (last 6 months)
+    
     m_labels, m_income, m_expense = [], [], []
     for i in range(5, -1, -1):
         if today.month - i <= 0:
