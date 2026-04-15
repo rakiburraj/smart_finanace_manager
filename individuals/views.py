@@ -87,3 +87,55 @@ def dashboard(request):
         'm_income':     json.dumps(m_income),
         'm_expense':    json.dumps(m_expense),
     })
+
+@login_required
+def add_transaction(request):
+    form = TransactionForm(request.POST or None)
+    if form.is_valid():
+        txn      = form.save(commit=False)
+        txn.user = request.user
+        txn.save()
+        messages.success(request, 'Transaction added successfully!')
+        return redirect('individuals:dashboard')
+    return render(request, 'individuals/add_transaction.html', {'form': form})
+
+@login_required
+def transaction_list(request):
+    txns     = IndividualTransaction.objects.filter(user=request.user)
+    filter_type = request.GET.get('type', '')
+    filter_period = request.GET.get('period', '')
+    today = date.today()
+
+    if filter_type:
+        txns = txns.filter(type=filter_type)
+    if filter_period == 'today':
+        txns = txns.filter(date=today)
+    elif filter_period == 'month':
+        txns = txns.filter(date__year=today.year, date__month=today.month)
+    elif filter_period == 'year':
+        txns = txns.filter(date__year=today.year)
+
+    return render(request, 'individuals/transaction_list.html', {
+        'txns': txns, 'filter_type': filter_type, 'filter_period': filter_period
+    })
+
+@login_required
+def set_budget(request):
+    budget, _ = IndividualBudget.objects.get_or_create(user=request.user)
+    form = BudgetForm(request.POST or None, instance=budget)
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Budget updated!')
+        return redirect('individuals:dashboard')
+    return render(request, 'individuals/set_budget.html', {'form': form})
+
+@login_required
+def edit_profile(request):
+    from accounts.forms import IndividualUpdateForm
+    form = IndividualUpdateForm(request.POST or None, request.FILES or None, instance=request.user)
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Profile updated!')
+        return redirect('individuals:dashboard')
+    return render(request, 'individuals/edit_profile.html', {'form': form})
+
