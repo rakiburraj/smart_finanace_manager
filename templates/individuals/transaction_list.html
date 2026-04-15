@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold">
+      <i class="bi bi-list-ul me-2"></i>
+      Transactions
+    </h4>
+
+    <a href="{% url 'individuals:add_transaction' %}"
+       class="btn btn-primary btn-sm"
+       style="border-radius:8px;">
+      + Add New
+    </a>
+  </div>
+
+  
+  <form method="GET" class="row g-2 mb-4">
+
+    <div class="col-md-4">
+      <select name="type" class="form-select">
+        <option value="">All Types</option>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <select name="period" class="form-select">
+        <option value="">All Time</option>
+        <option value="today">Today</option>
+        <option value="month">This Month</option>
+        <option value="year">This Year</option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <button class="btn btn-dark w-100" style="border-radius:8px;">
+        Filter
+      </button>
+    </div>
+
+  </form>
+
+  
+  <div class="card border-0 shadow-sm" style="border-radius:12px;">
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th class="text-end">Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for txn in txns %}
+          <tr>
+
+            <td>{{ txn.date }}</td>
+            <td>{{ txn.description }}</td>
+            <td>{{ txn.category }}</td>
+
+            <td>
+              {% if txn.type == 'income' %}
+              <span class="badge bg-success">Income</span>
+              {% else %}
+              <span class="badge bg-danger">Expense</span>
+              {% endif %}
+            </td>
+
+            <td class="text-end fw-bold">
+              {% if txn.type == 'income' %}+{% else %}-{% endif %}
+              ৳{{ txn.amount }}
+            </td>
+
+           
+
+          </tr>
+          {% endfor %}
+        </tbody>
+
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
