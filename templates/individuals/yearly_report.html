@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+
+  <h4 class="fw-bold mb-3">Yearly Report - {{ year }}</h4>
+
+  <form method="GET" class="d-flex gap-2 mb-3">
+    <input type="number" name="year" value="{{ year }}" class="form-control">
+    <button class="btn btn-primary">Search</button>
+  </form>
+
+  <div class="row mb-3">
+    <div class="col">
+      <div class="card p-3">
+        <h6>Total Income</h6>
+        <h4 class="text-success">৳{{ total_income }}</h4>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card p-3">
+        <h6>Total Expense</h6>
+        <h4 class="text-danger">৳{{ total_expense }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Income</th>
+          <th>Expense</th>
+          <th>Net</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for m in data %}
+        <tr>
+          <td>{{ m.month }}</td>
+          <td class="text-success">৳{{ m.income }}</td>
+          <td class="text-danger">৳{{ m.expense }}</td>
+          <td>
+            <b class="{% if m.net >= 0 %}text-success{% else %}text-danger{% endif %}">
+              ৳{{ m.net }}
+            </b>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}
