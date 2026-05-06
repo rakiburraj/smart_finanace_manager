@@ -4,24 +4,15 @@ from .models import IndividualTransaction, IndividualBudget
 
 User = get_user_model()
 
-INCOME_CATEGORIES = [
-    ('salary','Salary'), ('freelance','Freelance'),
-    ('business','Business'), ('investment','Investment'), ('other','Other'),
-]
 
-EXPENSE_CATEGORIES = [
-    ('food','Food'), ('transport','Transport'), ('shopping','Shopping'),
-    ('health','Health'), ('education','Education'),
-    ('rent','Rent'), ('entertainment','Entertainment'), ('other','Other'),
-]
 
 
 class TransactionForm(forms.ModelForm):
-    category = forms.ChoiceField(choices=[])
+   
 
     class Meta:
         model = IndividualTransaction
-        fields = ['type', 'amount', 'category', 'description', 'date']
+        fields = ['type', 'amount', 'description', 'date']
         widgets = {'date': forms.DateInput(attrs={'type': 'date'})}
 
     def __init__(self, *args, **kwargs):
@@ -29,10 +20,7 @@ class TransactionForm(forms.ModelForm):
 
         txn_type = self.data.get('type') or (self.instance.type if self.instance.pk else 'income')
 
-        self.fields['category'].choices = (
-            EXPENSE_CATEGORIES if txn_type == 'expense' else INCOME_CATEGORIES
-        )
-
+        
 
 class BudgetForm(forms.ModelForm):
     class Meta:
