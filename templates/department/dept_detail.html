@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="background:#f8fafc;min-height:100vh;padding:32px 0;">
+<div class="container-fluid" style="max-width:1100px;">
+
+  
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h4 style="font-weight:700;color:#0f172a;margin:0;">
+        <i class="bi bi-building me-2" style="color:#2563eb;"></i>{{ dept.name }} (Finance View)
+      </h4>
+      <p style="color:#64748b;font-size:0.88rem;margin:4px 0 0;">
+        Finance Head Dashboard • {{ today|date:"l, F d Y" }}
+      </p>
+    </div>
+  </div>
+
+  
+  <div class="row g-3 mb-4">
+
+    <div class="col-lg-4 col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
+        <p style="font-size:0.72rem;color:#64748b;font-weight:600;">Total Budget</p>
+        <p style="font-size:1.3rem;font-weight:700;color:#0f172a;">
+          ৳{{ dept.total_budget|floatformat:0 }}
+        </p>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
+        <p style="font-size:0.72rem;color:#64748b;font-weight:600;">This Month Expense</p>
+        <p style="font-size:1.3rem;font-weight:700;color:#dc2626;">
+          ৳{{ month_expense|floatformat:0 }}
+        </p>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
+        <p style="font-size:0.72rem;color:#64748b;font-weight:600;">This Month Income</p>
+        <p style="font-size:1.3rem;font-weight:700;color:#16a34a;">
+          ৳{{ month_income|floatformat:0 }}
+        </p>
+      </div>
+    </div>
+
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+  <a href="{% url 'department:monthly_report' dept.id %}"
+     style="background:#2563eb;color:white;padding:8px 14px;border-radius:10px;
+            text-decoration:none;font-size:0.85rem;font-weight:600;">
+    Monthly Report
+  </a>
+
+  <a href="{% url 'department:yearly_report' dept.id %}"
+     style="background:#16a34a;color:white;padding:8px 14px;border-radius:10px;
+            text-decoration:none;font-size:0.85rem;font-weight:600;">
+    Yearly Report
+  </a>
+
+</div>
+
+  
+  
+  <div class="row g-3">
+
+    <div class="col-lg-8">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
+
+        <div style="padding:18px 22px;border-bottom:1px solid #f1f5f9;">
+          <h6 style="font-weight:700;margin:0;">All Transactions</h6>
+        </div>
+
+        {% for txn in txns %}
+        <div style="padding:14px 22px;border-bottom:1px solid #f8fafc;display:flex;justify-content:space-between;align-items:center;">
+
+          <div>
+            <p style="margin:0;font-weight:600;">{{ txn.description }}</p>
+            <small style="color:#94a3b8;">{{ txn.date }}</small>
+          </div>
+
+          <div style="font-weight:700;
+                      color:{% if txn.type == 'income' %}#16a34a{% else %}#dc2626{% endif %};">
+            {% if txn.type == 'income' %}+{% else %}-{% endif %}৳{{ txn.amount }}
+          </div>
+
+        </div>
+        {% empty %}
+        <div style="padding:30px;text-align:center;color:#94a3b8;">
+          No transactions found
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+    
+    <div class="col-lg-4">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;">
+
+        <div style="padding:18px 22px;border-bottom:1px solid #f1f5f9;">
+          <h6 style="font-weight:700;margin:0;">Budget Requests</h6>
+        </div>
+
+        {% for req in requests %}
+        <div style="padding:14px 18px;border-bottom:1px solid #f8fafc;">
+          <p style="margin:0;font-weight:700;">৳{{ req.requested_amount }}</p>
+          <small style="color:#64748b;">{{ req.reason }}</small>
+          <div style="margin-top:6px;font-size:0.8rem;">
+            Status: <b>{{ req.status }}</b>
+          </div>
+        </div>
+        {% empty %}
+        <div style="padding:30px;text-align:center;color:#94a3b8;">
+          No requests
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const labels = JSON.parse('{{ m_labels|escapejs }}');
+const income = JSON.parse('{{ m_income|escapejs }}');
+const expense = JSON.parse('{{ m_expense|escapejs }}');
+
+const ctx = document.getElementById('barChart').getContext('2d');
+
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Income',
+        data: income,
+        borderColor: '#16a34a',
+        backgroundColor: 'rgba(22,163,74,0.2)',
+        borderWidth: 2
+      },
+      {
+        label: 'Expense',
+        data: expense,
+        borderColor: '#dc2626',
+        backgroundColor: 'rgba(220,38,38,0.2)',
+        borderWidth: 2
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
+{% endblock %}
