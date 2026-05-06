@@ -132,3 +132,148 @@ def remove_rep(request, dept_id):
         old_user.delete()
         messages.success(request, f'Rep "{rep_name}" removed.')
     return redirect('department:head_dashboard')
+
+
+@login_required
+def update_budget(request, dept_id):
+    dept = get_object_or_404(Department, id=dept_id, finance_head=request.user)
+    form = BudgetUpdateForm(request.POST or None, instance=dept)
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Budget updated!')
+        return redirect('department:head_dashboard')
+    return render(request, 'department/update_budget.html', {'form': form, 'dept': dept})
+
+
+@login_required
+def dept_detail(request, dept_id):
+    dept = get_object_or_404(Department, id=dept_id, finance_head=request.user)
+
+    txns = dept.transactions.all()
+    requests = dept.budget_requests.all()
+    today = date.today()
+
+    
+    month_txns = txns.filter(date__year=today.year, date__month=today.month)
+
+    month_expense = float(
+        month_txns.filter(type='expense')
+        .aggregate(Sum('amount'))['amount__sum'] or 0
+    )
+
+    month_income = float(
+        month_txns.filter(type='income')
+        .aggregate(Sum('amount'))['amount__sum'] or 0
+    )
+
+    total_budget = float(dept.total_budget())
+    remaining = max(total_budget - month_expense, 0)
+
+    pct_used = round((month_expense / total_budget * 100)) if total_budget > 0 else 0
+    pct_used = min(pct_used, 100)
+    budget_exceeded = month_expense >= total_budget and total_budget > 0
+
+    
+    labels, inc_data, exp_data = [], [], []
+
+    for i in range(6, -1, -1):
+        d = today - timedelta(days=i)
+        labels.append(d.strftime('%b %d'))
+
+        inc_data.append(float(
+            txns.filter(date=d, type='income')
+            .aggregate(Sum('amount'))['amount__sum'] or 0
+        ))
+
+        exp_data.append(float(
+            txns.filter(date=d, type='expense')
+            .aggregate(Sum('amount'))['amount__sum'] or 0
+        ))
+
+    
+    recent_txns = txns.order_by('-date')[:8]
+
+    return render(request, 'department/dept_detail.html', {
+        'dept': dept,
+        'txns': txns,
+        'requests': requests,
+
+        
+        'month_expense': month_expense,
+        'month_income': month_income,
+        'total_budget': total_budget,
+        'remaining': remaining,
+        'pct_used': pct_used,
+        'budget_exceeded': budget_exceeded,
+
+        # rep-style analytics
+        'recent_txns': recent_txns,
+        'labels': json.dumps(labels),
+        'inc_data': json.dumps(inc_data),
+        'exp_data': json.dumps(exp_data),
+        'today': today,
+    })
+
+
+@login_required
+def respond_budget(request, req_id, action):
+    br   = get_object_or_404(BudgetRequest, id=req_id)
+    dept = br.department
+    if dept.finance_head != request.user:
+        return redirect('/')
+    if action == 'approve':
+        dept.monthly_budget += br.requested_amount
+        dept.save()
+        br.status = 'approved'
+        messages.success(request, f'Budget request approved! ৳{br.requested_amount} added.')
+    elif action == 'reject':
+        br.status = 'rejected'
+        messages.warning(request, 'Budget request rejected.')
+    br.responded_by   = request.user
+    br.response_date  = timezone.now()
+    br.save()
+    return redirect('department:head_dashboard')
+
+
+
+
+@login_required
+def rep_dashboard(request):
+    if request.user.role != 'dept_rep':
+        return redirect('/')
+    rep  = get_object_or_404(DepartmentRep, user=request.user)
+    dept = rep.department
+    today = date.today()
+
+    txns = dept.transactions.all()
+    month_txns    = txns.filter(date__year=today.year, date__month=today.month)
+    month_expense = float(month_txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0)
+    month_income  = float(month_txns.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0)
+    total_budget  = float(dept.total_budget())
+    remaining     = max(total_budget - month_expense, 0)
+    pct_used      = round((month_expense / total_budget * 100)) if total_budget > 0 else 0
+    pct_used      = min(pct_used, 100)
+    budget_exceeded = month_expense >= total_budget and total_budget > 0
+
+    
+    labels, inc_data, exp_data = [], [], []
+    for i in range(6, -1, -1):
+        d = today - timedelta(days=i)
+        labels.append(d.strftime('%b %d'))
+        inc_data.append(float(txns.filter(date=d, type='income').aggregate(Sum('amount'))['amount__sum'] or 0))
+        exp_data.append(float(txns.filter(date=d, type='expense').aggregate(Sum('amount'))['amount__sum'] or 0))
+
+    budget_requests = dept.budget_requests.all()[:5]
+
+    return render(request, 'department/rep_dashboard.html', {
+        'dept': dept, 'rep': rep,
+        'month_expense': month_expense, 'month_income': month_income,
+        'total_budget': total_budget, 'remaining': remaining,
+        'pct_used': pct_used, 'budget_exceeded': budget_exceeded,
+        'recent_txns': txns[:8],
+        'budget_requests': budget_requests,
+        'today': today,
+        'labels':   json.dumps(labels),
+        'inc_data': json.dumps(inc_data),
+        'exp_data': json.dumps(exp_data),
+    })
