@@ -138,4 +138,81 @@ def edit_profile(request):
         messages.success(request, 'Profile updated!')
         return redirect('individuals:dashboard')
     return render(request, 'individuals/edit_profile.html', {'form': form})
+from datetime import date
+from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
+@login_required
+def individual_monthly_report(request):
+    user = request.user
+
+    year = int(request.GET.get('year', date.today().year))
+    month = request.GET.get('month')
+
+    txns = user.ind_transactions.filter(date__year=year)
+
+    if month:
+        txns = txns.filter(date__month=int(month))
+
+        income = txns.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+        expense = txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+        monthly_data = [{
+            "month": f"{year}-{month}",
+            "income": float(income),
+            "expense": float(expense),
+            "net": float(income - expense),
+        }]
+    else:
+        monthly_data = []
+        for m in range(1, 13):
+            m_txn = txns.filter(date__month=m)
+
+            income = m_txn.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+            expense = m_txn.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+            monthly_data.append({
+                "month": date(year, m, 1).strftime("%B"),
+                "income": float(income),
+                "expense": float(expense),
+                "net": float(income - expense),
+            })
+
+    return render(request, "individuals/monthly_report.html", {
+        "monthly_data": monthly_data,
+        "year": year,
+        "month": month,
+    })
+@login_required
+def individual_yearly_report(request):
+    user = request.user
+
+    year = int(request.GET.get('year', date.today().year))
+
+    txns = user.ind_transactions.filter(date__year=year)
+
+    total_income = txns.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense = txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+    data = []
+
+    for m in range(1, 13):
+        m_txn = txns.filter(date__month=m)
+
+        income = m_txn.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+        expense = m_txn.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+        data.append({
+            "month": date(year, m, 1).strftime("%B"),
+            "income": float(income),
+            "expense": float(expense),
+            "net": float(income - expense),
+        })
+
+    return render(request, "individuals/yearly_report.html", {
+        "data": data,
+        "year": year,
+        "total_income": float(total_income),
+        "total_expense": float(total_expense),
+    })
