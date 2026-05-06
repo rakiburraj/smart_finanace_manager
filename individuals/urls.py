@@ -9,6 +9,8 @@ urlpatterns = [
     path('transactions/', views.transaction_list, name='transaction_list'),
     path('budget/', views.set_budget, name='set_budget'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('report/monthly/', views.individual_monthly_report, name='monthly_report'),
+    path('report/yearly/', views.individual_yearly_report, name='yearly_report'),
    
     
 ]
