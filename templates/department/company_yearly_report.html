@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="background:#f8fafc;min-height:100vh;padding:32px 0;">
+<div class="container" style="max-width:1000px;">
+
+  
+  <h4 style="font-weight:700;margin-bottom:10px;">
+    Company Yearly Report
+  </h4>
+
+  <p style="color:#64748b;margin-bottom:20px;">
+    Full yearly financial overview of all departments
+  </p>
+
+  
+  <form method="GET" style="display:flex;gap:10px;margin-bottom:20px;">
+    <input type="number" name="year" value="{{ year }}" class="form-control" style="max-width:200px;" placeholder="Year">
+    <button class="btn btn-primary">Search</button>
+  </form>
+
+  
+  <div class="row g-3 mb-4">
+
+    <div class="col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:20px;">
+        <p style="color:#64748b;font-weight:600;">Total Income</p>
+        <h4 style="color:#16a34a;">৳{{ total_income }}</h4>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:20px;">
+        <p style="color:#64748b;font-weight:600;">Total Expense</p>
+        <h4 style="color:#dc2626;">৳{{ total_expense }}</h4>
+      </div>
+    </div>
+
+  </div>
+
+  
+  <div style="background:white;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+
+    <table style="width:100%;border-collapse:collapse;">
+      <thead style="background:#f1f5f9;">
+        <tr>
+          <th style="padding:12px;">Month</th>
+          <th>Income</th>
+          <th>Expense</th>
+          <th>Net</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for m in data %}
+        <tr style="border-top:1px solid #f1f5f9;">
+          <td style="padding:12px;">{{ m.month }}</td>
+
+          <td style="color:#16a34a;font-weight:600;">
+            ৳{{ m.income }}
+          </td>
+
+          <td style="color:#dc2626;font-weight:600;">
+            ৳{{ m.expense }}
+          </td>
+
+          <td style="font-weight:700;
+                     color:{% if m.net >= 0 %}#16a34a{% else %}#dc2626{% endif %};">
+            ৳{{ m.net }}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" style="text-align:center;padding:20px;color:#94a3b8;">
+            No data found
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+</div>
+
+{% endblock %}
