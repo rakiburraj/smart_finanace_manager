@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="background:#f8fafc;min-height:100vh;padding:32px 0;">
+<div class="container" style="max-width:1000px;">
+
+ 
+  <h4 style="font-weight:700;margin-bottom:10px;">
+    Company Monthly Report
+  </h4>
+
+  <p style="color:#64748b;margin-bottom:20px;">
+    Overall financial performance of all departments
+  </p>
+
+  
+  <form method="GET" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+
+    
+    <input type="number"
+           name="year"
+           value="{{ year }}"
+           class="form-control"
+           style="max-width:200px;"
+           placeholder="Year">
+
+   
+    <select name="month"
+            class="form-control"
+            style="max-width:220px;">
+
+      <option value="">All Months</option>
+
+      <option value="1"  {% if month == 1 %}selected{% endif %}>January</option>
+      <option value="2"  {% if month == 2 %}selected{% endif %}>February</option>
+      <option value="3"  {% if month == 3 %}selected{% endif %}>March</option>
+      <option value="4"  {% if month == 4 %}selected{% endif %}>April</option>
+      <option value="5"  {% if month == 5 %}selected{% endif %}>May</option>
+      <option value="6"  {% if month == 6 %}selected{% endif %}>June</option>
+      <option value="7"  {% if month == 7 %}selected{% endif %}>July</option>
+      <option value="8"  {% if month == 8 %}selected{% endif %}>August</option>
+      <option value="9"  {% if month == 9 %}selected{% endif %}>September</option>
+      <option value="10" {% if month == 10 %}selected{% endif %}>October</option>
+      <option value="11" {% if month == 11 %}selected{% endif %}>November</option>
+      <option value="12" {% if month == 12 %}selected{% endif %}>December</option>
+
+    </select>
+
+    <button class="btn btn-primary">
+      Search
+    </button>
+
+  </form>
+
+  
+  <div style="background:white;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+
+    <table style="width:100%;border-collapse:collapse;">
+
+      <thead style="background:#f1f5f9;">
+        <tr>
+          <th style="padding:12px;">Month</th>
+          <th>Income</th>
+          <th>Expense</th>
+          <th>Net</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for m in monthly_data %}
+        <tr style="border-top:1px solid #f1f5f9;">
+
+          <td style="padding:12px;font-weight:600;">
+            {{ m.month }}
+          </td>
+
+          <td style="color:#16a34a;font-weight:600;">
+            ৳{{ m.income }}
+          </td>
+
+          <td style="color:#dc2626;font-weight:600;">
+            ৳{{ m.expense }}
+          </td>
+
+          <td style="font-weight:700;
+                     color:{% if m.net >= 0 %}#16a34a{% else %}#dc2626{% endif %};">
+            ৳{{ m.net }}
+          </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" style="text-align:center;padding:20px;color:#94a3b8;">
+            No data found
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+</div>
+
+{% endblock %}
