@@ -277,3 +277,127 @@ def rep_dashboard(request):
         'inc_data': json.dumps(inc_data),
         'exp_data': json.dumps(exp_data),
     })
+
+
+@login_required
+def add_dept_transaction(request):
+    if request.user.role != 'dept_rep':
+        return redirect('/')
+    rep  = get_object_or_404(DepartmentRep, user=request.user)
+    dept = rep.department
+    today = date.today()
+
+    
+    month_expense = float(dept.transactions.filter(
+        date__year=today.year, date__month=today.month, type='expense'
+    ).aggregate(Sum('amount'))['amount__sum'] or 0)
+    budget_exceeded = month_expense >= float(dept.total_budget()) and float(dept.total_budget()) > 0
+
+    form = DeptTransactionForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        txn_type = form.cleaned_data['type']
+        amount   = float(form.cleaned_data['amount'])
+
+        
+        if txn_type == 'expense' and budget_exceeded:
+            messages.error(request, 'Budget exceeded! You cannot add more expenses. Request more budget first.')
+            return redirect('department:rep_dashboard')
+
+        
+        if txn_type == 'expense' and float(dept.total_budget()) > 0:
+            if month_expense + amount > float(dept.total_budget()):
+                messages.error(request, f'This expense (৳{amount}) will exceed your budget! Request more budget first.')
+                return redirect('department:add_dept_transaction')
+
+        txn = form.save(commit=False)
+        txn.department = dept
+        txn.added_by   = request.user
+        txn.save()
+        messages.success(request, 'Transaction added!')
+        return redirect('department:rep_dashboard')
+
+    return render(request, 'department/add_dept_transaction.html', {
+        'form': form, 'dept': dept,
+        'budget_exceeded': budget_exceeded,
+        'month_expense': month_expense,
+        'total_budget': float(dept.total_budget()),
+    })
+
+
+@login_required
+def request_budget(request):
+    if request.user.role != 'dept_rep':
+        return redirect('/')
+    rep  = get_object_or_404(DepartmentRep, user=request.user)
+    dept = rep.department
+    form = BudgetRequestForm(request.POST or None)
+    if form.is_valid():
+        br = form.save(commit=False)
+        br.department   = dept
+        br.requested_by = request.user
+        br.save()
+        messages.success(request, 'Budget request submitted!')
+        return redirect('department:rep_dashboard')
+    return render(request, 'department/request_budget.html', {'form': form, 'dept': dept})
+
+
+@login_required
+def delete_dept_transaction(request, pk):
+    rep = get_object_or_404(DepartmentRep, user=request.user)
+    txn = get_object_or_404(DepartmentTransaction, pk=pk, department=rep.department)
+    txn.delete()
+    messages.success(request, 'Transaction deleted.')
+    return redirect('department:rep_dashboard')
+
+from django.db.models import Sum
+from django.db.models.functions import TruncMonth
+from datetime import date
+
+@login_required
+def monthly_report(request, dept_id):
+    dept = get_object_or_404(Department, id=dept_id)
+
+    year = int(request.GET.get('year', date.today().year))
+    month = request.GET.get('month')
+
+    txns = dept.transactions.filter(date__year=year)
+
+    
+    if month:
+        txns = txns.filter(date__month=int(month))
+
+    monthly_data = []
+
+    
+    if month:
+        income = txns.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+        expense = txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+        monthly_data.append({
+            'month': f"{year}-{month}",
+            'income': float(income),
+            'expense': float(expense),
+            'net': float(income) - float(expense),
+        })
+
+    else:
+        
+        for m in range(1, 13):
+            m_txn = txns.filter(date__month=m)
+
+            income = m_txn.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+            expense = m_txn.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+            monthly_data.append({
+                'month': f"{year}-{m}",
+                'income': float(income),
+                'expense': float(expense),
+                'net': float(income) - float(expense),
+            })
+
+    return render(request, 'department/monthly_report.html', {
+        'dept': dept,
+        'monthly_data': monthly_data,
+        'year': year,
+        'month': int(month) if month else None,
+    })
