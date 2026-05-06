@@ -401,3 +401,140 @@ def monthly_report(request, dept_id):
         'year': year,
         'month': int(month) if month else None,
     })
+from django.db.models import Sum
+from django.db.models.functions import ExtractYear
+
+from datetime import date
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def yearly_report(request, dept_id):
+    dept = get_object_or_404(Department, id=dept_id)
+
+    
+    year = int(request.GET.get('year', date.today().year))
+
+    
+    txns = dept.transactions.filter(date__year=year)
+
+    
+    total_income = txns.filter(type='income').aggregate(
+        Sum('amount')
+    )['amount__sum'] or 0
+
+    total_expense = txns.filter(type='expense').aggregate(
+        Sum('amount')
+    )['amount__sum'] or 0
+
+    
+    data = []
+
+    for m in range(1, 13):
+        month_txns = txns.filter(date__month=m)
+
+        income = month_txns.filter(type='income').aggregate(
+            Sum('amount')
+        )['amount__sum'] or 0
+
+        expense = month_txns.filter(type='expense').aggregate(
+            Sum('amount')
+        )['amount__sum'] or 0
+
+        data.append({
+            "month": date(year, m, 1).strftime("%B"),  # January, February...
+            "income": float(income),
+            "expense": float(expense),
+            "net": float(income) - float(expense),
+        })
+
+    return render(request, 'department/yearly_report.html', {
+        'dept': dept,
+        'data': data,
+        'year': year,
+        'total_income': float(total_income),
+        'total_expense': float(total_expense),
+    })
+@login_required
+def company_monthly_report(request):
+    if request.user.role != 'finance_head':
+        return redirect('/')
+
+    year = int(request.GET.get('year', date.today().year))
+    month = request.GET.get('month')
+
+    txns = DepartmentTransaction.objects.filter(
+        department__finance_head=request.user,
+        date__year=year
+    )
+
+    if month:
+        txns = txns.filter(date__month=int(month))
+
+        income = txns.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+        expense = txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+        monthly_data = [{
+            'month': f"{year}-{month}",
+            'income': float(income),
+            'expense': float(expense),
+            'net': float(income - expense)
+        }]
+    else:
+        monthly_data = []
+
+        for m in range(1, 13):
+            m_txns = txns.filter(date__month=m)
+
+            income = m_txns.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+            expense = m_txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+            monthly_data.append({
+                'month': f"{year}-{m}",
+                'income': float(income),
+                'expense': float(expense),
+                'net': float(income - expense),
+            })
+
+    return render(request, 'department/company_monthly_report.html', {
+        'year': year,
+        'month': month,
+        'monthly_data': monthly_data,
+    })
+@login_required
+def company_yearly_report(request):
+    if request.user.role != 'finance_head':
+        return redirect('/')
+
+    year = int(request.GET.get('year', date.today().year))
+
+    txns = DepartmentTransaction.objects.filter(
+        department__finance_head=request.user,
+        date__year=year
+    )
+
+    total_income = txns.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense = txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+    data = []
+
+    for m in range(1, 13):
+        m_txns = txns.filter(date__month=m)
+
+        income = m_txns.filter(type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+        expense = m_txns.filter(type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+        data.append({
+            "month": date(year, m, 1).strftime("%B"),
+            "income": float(income),
+            "expense": float(expense),
+            "net": float(income - expense),
+        })
+
+    return render(request, 'department/company_yearly_report.html', {
+        'year': year,
+        'data': data,
+        'total_income': float(total_income),
+        'total_expense': float(total_expense),
+    })  
