@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="auth-section">
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-lg-6 col-md-8">
+
+  
+  {% if budget_exceeded %}
+  <div style="background:#fef2f2;border:1px solid #fca5a5;padding:18px;border-radius:14px;margin-bottom:20px;text-align:center;">
+    <i class="bi bi-exclamation-triangle-fill" style="font-size:2rem;color:#dc2626;"></i>
+    <h5 style="color:#991b1b;margin-top:8px;">Budget Fully Used</h5>
+    <p style="color:#dc2626;font-size:0.9rem;">
+      Expense entry is disabled. Request more budget first.
+    </p>
+  </div>
+  {% endif %}
+
+  
+  <div class="text-center mb-4">
+    <div style="font-size:2.5rem;color:#2563eb;">
+      <i class="bi bi-plus-circle-fill"></i>
+    </div>
+    <h2 style="font-weight:700;">Add Transaction</h2>
+    <p style="color:#6b7280;">
+      {{ dept.name }} | Budget: ৳{{ total_budget|floatformat:0 }} | Spent: ৳{{ month_expense|floatformat:0 }}
+    </p>
+  </div>
+
+  
+  <div style="background:white;padding:25px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      
+      <label style="font-weight:600;margin-bottom:8px;display:block;">Transaction Type</label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+
+        
+        <label style="cursor:pointer;">
+          <input type="radio" name="type" value="income" checked onchange="switchType('income')" style="display:none;">
+
+          <div id="incomeBox"
+               style="border:2px solid #16a34a;border-radius:14px;padding:14px;text-align:center;background:#f0fdf4;">
+            <i class="bi bi-arrow-up-circle-fill" style="font-size:1.6rem;color:#16a34a;"></i>
+            <div style="font-weight:700;color:#16a34a;margin-top:5px;">Income</div>
+          </div>
+        </label>
+
+        
+        <label style="cursor:pointer;">
+          <input type="radio" name="type" value="expense"
+                 onchange="switchType('expense')"
+                 {% if budget_exceeded %}disabled{% endif %}
+                 style="display:none;">
+
+          <div id="expenseBox"
+               style="border:2px solid #e5e7eb;border-radius:14px;padding:14px;text-align:center;background:#f9fafb;
+               {% if budget_exceeded %}opacity:0.4;{% endif %}">
+            <i class="bi bi-arrow-down-circle-fill" style="font-size:1.6rem;color:#9ca3af;"></i>
+            <div style="font-weight:700;color:#6b7280;margin-top:5px;">Expense</div>
+          </div>
+        </label>
+
+      </div>
+
+      
+      <div style="margin-bottom:15px;">
+        <label style="font-weight:600;">Amount (BDT)</label>
+        <input type="number" name="amount" step="0.01"
+               class="form-control"
+               placeholder="Enter amount" required>
+      </div>
+
+      
+      <div style="margin-bottom:15px;">
+        <label style="font-weight:600;">Description</label>
+        <textarea name="description"
+                  id="descBox"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Enter details..." required></textarea>
+      </div>
+
+      
+      <div id="receiptBox"
+           style="display:none;margin-bottom:15px;">
+        <label style="font-weight:600;">
+          Receipt (Optional)
+        </label>
+        <input type="file" name="receipt" class="form-control">
+        <small style="color:#6b7280;">Upload proof if available</small>
+      </div>
+
+      
+      <div style="margin-bottom:20px;">
+        <label style="font-weight:600;">Date</label>
+        <input type="date" name="date" id="dateInput" class="form-control" required>
+      </div>
+
+      
+      <button type="submit"
+              style="width:100%;padding:12px;border:none;border-radius:10px;
+              background:#2563eb;color:white;font-weight:600;">
+        Save Transaction
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+</div>
+</div>
+</section>
+
+<script>
+document.getElementById("dateInput").value = new Date().toISOString().split("T")[0];
+
+function switchType(type) {
+    const receiptBox = document.getElementById("receiptBox");
+    const desc = document.getElementById("descBox");
+
+    const incomeBox = document.getElementById("incomeBox");
+    const expenseBox = document.getElementById("expenseBox");
+
+    if (type === "income") {
+        receiptBox.style.display = "none";
+
+        incomeBox.style.border = "2px solid #16a34a";
+        incomeBox.style.background = "#f0fdf4";
+
+        expenseBox.style.border = "2px solid #e5e7eb";
+        expenseBox.style.background = "#f9fafb";
+
+        desc.placeholder = "Income details (no proof needed)";
+    } else {
+        receiptBox.style.display = "block";
+
+        expenseBox.style.border = "2px solid #dc2626";
+        expenseBox.style.background = "#fef2f2";
+
+        incomeBox.style.border = "2px solid #16a34a";
+        incomeBox.style.background = "#f0fdf4";
+
+        desc.placeholder = "Expense details (receipt optional)";
+    }
+}
+</script>
+
+{% endblock %}
