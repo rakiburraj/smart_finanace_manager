@@ -1,32 +1,61 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container py-5">
+<div style="background:#f8fafc;min-height:100vh;padding:50px 0;">
+
+<div class="container">
 
   <div class="row justify-content-center">
     <div class="col-md-6">
 
-      <div class="card shadow-sm border-0" style="border-radius:12px;">
+     
+      <div style="background:white;border:1px solid #e2e8f0;
+                  border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.05);
+                  overflow:hidden;">
 
-        <div class="card-body p-4">
+       
+        <div style="background:linear-gradient(135deg,#2563eb,#1d4ed8);
+                    padding:22px;color:white;text-align:center;">
 
-          <h4 class="fw-bold mb-3">
-            <i class="bi bi-plus-circle me-2 text-primary"></i>
+          <i class="bi bi-plus-circle-fill" style="font-size:32px;"></i>
+
+          <h4 style="margin:10px 0 0;font-weight:700;">
             Add Transaction
           </h4>
 
-          <p class="text-muted small mb-4">
-            Track your income and expenses easily
+          <p style="margin:4px 0 0;font-size:0.85rem;opacity:0.9;">
+            Track income & expenses easily
           </p>
+
+        </div>
+
+       
+        <div style="padding:26px;">
 
           <form method="POST">
             {% csrf_token %}
-            {{ form.as_p }}
 
-            <button class="btn btn-primary w-100 mt-3"
-              style="border-radius:8px;">
+            
+            <div class="form-style">
+              {{ form.as_p }}
+            </div>
+
+           
+            <button type="submit"
+                    style="width:100%;margin-top:15px;
+                           padding:12px;border:none;
+                           border-radius:10px;
+                           background:#2563eb;
+                           color:white;
+                           font-weight:600;
+                           font-size:0.95rem;
+                           transition:0.2s;">
+
+              <i class="bi bi-check-circle me-1"></i>
               Save Transaction
+
             </button>
+
           </form>
 
         </div>
@@ -37,5 +66,49 @@
   </div>
 
 </div>
+
+</div>
+
+
+<style>
+/* Django form styling upgrade */
+.form-style p {
+    margin-bottom: 14px;
+}
+
+.form-style label {
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-style input,
+.form-style select,
+.form-style textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    outline: none;
+    transition: 0.2s;
+    background: #f8fafc;
+}
+
+.form-style input:focus,
+.form-style select:focus,
+.form-style textarea:focus {
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+/* Button hover */
+button:hover {
+    background:#1d4ed8;
+    transform: translateY(-1px);
+}
+</style>
 
 {% endblock %}
