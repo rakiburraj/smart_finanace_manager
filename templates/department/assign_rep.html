@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="auth-section">
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-lg-6 col-md-8">
+ 
+  <div class="text-center mb-4">
+    <div class="auth-icon blue"><i class="bi bi-person-plus-fill"></i></div>
+    <h2 class="auth-title">Assign Department Rep</h2>
+    <p class="auth-subtitle">For: <strong>{{ dept.name }}</strong></p>
+  </div>
+ 
+  <div class="auth-card">
+ 
+   
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;
+                padding:14px 16px;margin-bottom:24px;font-size:0.85rem;color:#1e40af;">
+      <i class="bi bi-info-circle-fill me-2"></i>
+      The rep will log in using the <strong>email</strong> and <strong>password</strong> you set here.
+      You can see and change their password anytime from the dashboard.
+    </div>
+ 
+    <form method="POST">
+      {% csrf_token %}
+ 
+      <div class="mb-3">
+        <label class="auth-label">Rep Full Name</label>
+        <div class="input-group">
+          <span class="input-group-text auth-input-icon"><i class="bi bi-person"></i></span>
+          <input type="text" name="rep_name" class="form-control"
+                 placeholder="e.g. Rahim Uddin" required>
+        </div>
+      </div>
+ 
+      <div class="mb-3">
+        <label class="auth-label">Rep Email</label>
+        <div class="input-group">
+          <span class="input-group-text auth-input-icon"><i class="bi bi-envelope"></i></span>
+          <input type="email" name="rep_email" class="form-control"
+                 placeholder="rep@company.com" required>
+        </div>
+      </div>
+ 
+      <div class="mb-4">
+        <label class="auth-label">Assign Password</label>
+        <div class="input-group">
+          <span class="input-group-text auth-input-icon"><i class="bi bi-key"></i></span>
+          <input type="text" name="password" class="form-control"
+                 placeholder="Create a password for them" required>
+        </div>
+        <p style="font-size:0.78rem;color:#94a3b8;margin-top:6px;">
+          <i class="bi bi-eye me-1"></i>Share this password with the rep — it will be visible on your dashboard.
+        </p>
+      </div>
+ 
+      {% if form.errors %}
+      <div class="alert alert-danger mb-3" style="font-size:0.88rem;border-radius:10px;">{{ form.errors }}</div>
+      {% endif %}
+ 
+      <button type="submit" class="auth-btn auth-btn-blue">
+        <i class="bi bi-person-check-fill"></i> Assign Rep
+      </button>
+    </form>
+ 
+    <p class="auth-bottom-link mt-3">
+      <a href="{% url 'department:head_dashboard' %}" class="blue">
+        <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+      </a>
+    </p>
+  </div>
+ 
+</div>
+</div>
+</div>
+</section>
+{% endblock %}
